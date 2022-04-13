@@ -4,5 +4,6 @@ out = 'out'
 libs = ['lib']
 verbosity = 2
 fuzz_runs = 1000
+fuzz_max_global_rejects = 100000000
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config
