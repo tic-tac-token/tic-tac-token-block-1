@@ -7,7 +7,21 @@ contract TicTacToken {
     uint256 public constant O = 2;
     uint256 internal prevMove;
 
+    address public playerX;
+    address public playerO;
+    address public owner;
+
     uint256[9] public board;
+
+    constructor(
+        address _owner,
+        address _playerX,
+        address _playerO
+    ) {
+        owner = _owner;
+        playerX = _playerX;
+        playerO = _playerO;
+    }
 
     function getBoard() public view returns (uint256[9] memory) {
         return board;
@@ -16,8 +30,8 @@ contract TicTacToken {
     // possible?
     function _rowWin(uint256 row) internal view returns (uint256) {
         uint256 column = row * 3;
-        /* 
-    
+        /*
+
     Previous version:
 
     if ((board[column] + board[column + 1] + board[column + 2]) % 3 == 0) {
@@ -30,8 +44,8 @@ contract TicTacToken {
     [0, 1, 2]
     [2, 0, 1]
     [1, 2, 0]
-    etc...  
-    
+    etc...
+
     */
         uint256 product = board[column] * board[column + 1] * board[column + 2];
         if (product == 8) {
@@ -83,14 +97,36 @@ contract TicTacToken {
         return 0;
     }
 
-    function markSpace(uint256 space, uint256 marker) public {
+    function markSpace(uint256 space) public {
+        require(_isPlayer(), "Unauthorized");
         require(_validSpace(space), "Invalid space");
-        require(_validMarker(marker), "Invalid Marker");
         require(_emptySpace(space), "Space already occupied");
-        require(_validTurn(marker), "Turns should alternate between X and O");
+        require(
+            _validTurn(_getMarker()),
+            "Turns should alternate between X and O"
+        );
 
-        board[space] = marker;
-        prevMove = marker;
+        board[space] = _getMarker();
+        prevMove = _getMarker();
+    }
+
+    function _getMarker() internal view returns (uint256) {
+        if (msg.sender == playerX) return X;
+        if (msg.sender == playerO) return O;
+        return 0;
+    }
+
+    function resetBoard() public {
+        require(msg.sender == owner, "Unauthorized");
+        delete board;
+    }
+
+    function msgSender() public view returns (address) {
+        return msg.sender;
+    }
+
+    function _isPlayer() internal view returns (bool) {
+        return msg.sender == playerX || msg.sender == playerO;
     }
 
     function _validSpace(uint256 space) internal pure returns (bool) {
