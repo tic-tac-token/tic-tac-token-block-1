@@ -191,7 +191,7 @@ contract TestTicTacToken is DSTest {
         playerX.markSpace(7);
         playerO.markSpace(6);
 
-        // assertEq(ttt.winner(), 0);
+        assertEq(ttt.winner(), 0);
     }
 
     function test_msg_sender() public {

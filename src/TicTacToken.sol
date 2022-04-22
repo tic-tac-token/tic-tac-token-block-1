@@ -23,30 +23,50 @@ contract TicTacToken {
         playerO = _playerO;
     }
 
+    function markSpace(uint256 space) public {
+        require(_isPlayer(), "Unauthorized");
+        require(_validSpace(space), "Invalid space");
+        require(_emptySpace(space), "Space already occupied");
+        require(
+            _validTurn(_getMarker()),
+            "Turns should alternate between X and O"
+        );
+
+        board[space] = _getMarker();
+        prevMove = _getMarker();
+    }
+
+    function resetBoard() public {
+        require(msg.sender == owner, "Unauthorized");
+        delete board;
+    }
+
     function getBoard() public view returns (uint256[9] memory) {
         return board;
     }
 
-    // possible?
-    function _rowWin(uint256 row) internal view returns (uint256) {
-        uint256 column = row * 3;
-        /*
-
-    Previous version:
-
-    if ((board[column] + board[column + 1] + board[column + 2]) % 3 == 0) {
-      return board[column];
+    function msgSender() public view returns (address) {
+        return msg.sender;
     }
 
-    However, this returns a false positive for some rows that add up to 3 but contain
-    mixed symbols. For example:
+    function winner() public view returns (uint256) {
+        uint256[5] memory potentialWins = [
+            _rowWin(0),
+            _rowWin(1),
+            _rowWin(2),
+            _diagWin(),
+            _antiDiagWin()
+        ];
+        for (uint256 i; i < potentialWins.length; i++) {
+            if (potentialWins[i] != 0) {
+                return potentialWins[i];
+            }
+        }
+        return 0;
+    }
 
-    [0, 1, 2]
-    [2, 0, 1]
-    [1, 2, 0]
-    etc...
-
-    */
+    function _rowWin(uint256 row) internal view returns (uint256) {
+        uint256 column = row * 3;
         uint256 product = board[column] * board[column + 1] * board[column + 2];
         if (product == 8) {
             return O;
@@ -81,48 +101,10 @@ contract TicTacToken {
         return 0;
     }
 
-    function winner() public view returns (uint256) {
-        uint256[5] memory potentialWins = [
-            _rowWin(0),
-            _rowWin(1),
-            _rowWin(2),
-            _diagWin(),
-            _antiDiagWin()
-        ];
-        for (uint256 i; i < potentialWins.length; i++) {
-            if (potentialWins[i] != 0) {
-                return potentialWins[i];
-            }
-        }
-        return 0;
-    }
-
-    function markSpace(uint256 space) public {
-        require(_isPlayer(), "Unauthorized");
-        require(_validSpace(space), "Invalid space");
-        require(_emptySpace(space), "Space already occupied");
-        require(
-            _validTurn(_getMarker()),
-            "Turns should alternate between X and O"
-        );
-
-        board[space] = _getMarker();
-        prevMove = _getMarker();
-    }
-
     function _getMarker() internal view returns (uint256) {
         if (msg.sender == playerX) return X;
         if (msg.sender == playerO) return O;
         return 0;
-    }
-
-    function resetBoard() public {
-        require(msg.sender == owner, "Unauthorized");
-        delete board;
-    }
-
-    function msgSender() public view returns (address) {
-        return msg.sender;
     }
 
     function _isPlayer() internal view returns (bool) {
