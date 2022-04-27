@@ -23,8 +23,17 @@ contract TicTacToken {
         playerO = _playerO;
     }
 
-    function markSpace(uint256 space) public {
-        require(_isPlayer(), "Unauthorized");
+    modifier isPlayer() {
+        require(msg.sender == playerX || msg.sender == playerO, "Unauthorized");
+        _;
+    }
+
+    modifier isOwner() {
+        require(msg.sender == owner, "Unauthorized");
+        _;
+    }
+
+    function markSpace(uint256 space) public isPlayer {
         require(_validSpace(space), "Invalid space");
         require(_emptySpace(space), "Space already occupied");
         require(
@@ -36,8 +45,7 @@ contract TicTacToken {
         prevMove = _getMarker();
     }
 
-    function resetBoard() public {
-        require(msg.sender == owner, "Unauthorized");
+    function resetBoard() public isOwner {
         delete board;
     }
 
@@ -45,15 +53,14 @@ contract TicTacToken {
         return board;
     }
 
-    function msgSender() public view returns (address) {
-        return msg.sender;
-    }
-
     function winner() public view returns (uint256) {
-        uint256[5] memory potentialWins = [
+        uint256[8] memory potentialWins = [
             _rowWin(0),
             _rowWin(1),
             _rowWin(2),
+            _colWin(0),
+            _colWin(1),
+            _colWin(2),
             _diagWin(),
             _antiDiagWin()
         ];
@@ -66,32 +73,27 @@ contract TicTacToken {
     }
 
     function _rowWin(uint256 row) internal view returns (uint256) {
-        uint256 column = row * 3;
-        uint256 product = board[column] * board[column + 1] * board[column + 2];
-        if (product == 8) {
-            return O;
-        }
-        if (product == 1) {
-            return X;
-        }
-        return 0;
+        uint256 idx = row * 3;
+        uint256 product = board[idx] * board[idx + 1] * board[idx + 2];
+        return _checkWin(product);
     }
 
-    function _colWin(uint256 col) internal view returns (uint256) {}
+    function _colWin(uint256 col) internal view returns (uint256) {
+        uint256 product = board[col] * board[col + 3] * board[col + 6];
+        return _checkWin(product);
+    }
 
     function _diagWin() internal view returns (uint256) {
         uint256 product = board[0] * board[4] * board[8];
-        if (product == 8) {
-            return O;
-        }
-        if (product == 1) {
-            return X;
-        }
-        return 0;
+        return _checkWin(product);
     }
 
     function _antiDiagWin() internal view returns (uint256) {
         uint256 product = board[2] * board[4] * board[6];
+        return _checkWin(product);
+    }
+
+    function _checkWin(uint256 product) internal pure returns (uint256) {
         if (product == 8) {
             return O;
         }
@@ -105,10 +107,6 @@ contract TicTacToken {
         if (msg.sender == playerX) return X;
         if (msg.sender == playerO) return O;
         return 0;
-    }
-
-    function _isPlayer() internal view returns (bool) {
-        return msg.sender == playerX || msg.sender == playerO;
     }
 
     function _validSpace(uint256 space) internal pure returns (bool) {

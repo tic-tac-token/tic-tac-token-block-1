@@ -5,18 +5,6 @@ import "ds-test/test.sol";
 import "forge-std/Vm.sol";
 import "../TicTacToken.sol";
 
-contract Caller {
-    TicTacToken internal ttt;
-
-    constructor(TicTacToken _ttt) {
-        ttt = _ttt;
-    }
-
-    function callMsgSender() public returns (address) {
-        return ttt.msgSender();
-    }
-}
-
 contract User {
     TicTacToken internal ttt;
     Vm internal vm;
@@ -141,7 +129,7 @@ contract TestTicTacToken is DSTest {
         assertEq(ttt.winner(), X);
     }
 
-    function xtest_checks_column_win() public {
+    function test_checks_column_win() public {
         playerO.markSpace(0);
         playerX.markSpace(1);
         playerO.markSpace(3);
@@ -192,18 +180,6 @@ contract TestTicTacToken is DSTest {
         playerO.markSpace(6);
 
         assertEq(ttt.winner(), 0);
-    }
-
-    function test_msg_sender() public {
-        Caller caller1 = new Caller(ttt);
-        Caller caller2 = new Caller(ttt);
-        Caller caller3 = new Caller(ttt);
-
-        assertEq(ttt.msgSender(), address(this));
-
-        assertEq(caller1.callMsgSender(), address(caller1));
-        assertEq(caller2.callMsgSender(), address(caller2));
-        assertEq(caller3.callMsgSender(), address(caller3));
     }
 
     function test_non_owner_cannot_reset_board() public {
