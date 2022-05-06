@@ -5,26 +5,30 @@ contract TicTacToken {
     uint256 public constant EMPTY = 0;
     uint256 public constant X = 1;
     uint256 public constant O = 2;
-    uint256 internal prevMove;
+    uint256 internal constant POINTS_PER_WIN = 5;
 
-    address public playerX;
-    address public playerO;
     address public owner;
+    uint256 internal nextGameId;
 
-    uint256[9] public board;
+    struct Game {
+        address playerX;
+        address playerO;
+        uint256 prevMove;
+        uint256[9] board;
+    }
+
+    mapping(uint256 => Game) public games;
+    mapping(address => uint256) public wins;
+    mapping(address => uint256) public points;
 
     constructor(
-        address _owner,
-        address _playerX,
-        address _playerO
+        address _owner
     ) {
         owner = _owner;
-        playerX = _playerX;
-        playerO = _playerO;
     }
 
     modifier isPlayer() {
-        require(msg.sender == playerX || msg.sender == playerO, "Unauthorized");
+        require(msg.sender == games[0].playerX || msg.sender == games[0].playerO, "Unauthorized");
         _;
     }
 
@@ -33,36 +37,49 @@ contract TicTacToken {
         _;
     }
 
-    function markSpace(uint256 space) public isPlayer {
+    function newGame(address playerX, address playerO) public {
+        games[nextGameId].playerX = playerX;
+        games[nextGameId].playerO = playerO;
+        nextGameId++;
+    }
+
+    function markSpace(uint256 id, uint256 space) public isPlayer {
         require(_validSpace(space), "Invalid space");
-        require(_emptySpace(space), "Space already occupied");
+        require(_emptySpace(id, space), "Space already occupied");
         require(
-            _validTurn(_getMarker()),
+            _validTurn(id, _getMarker(id)),
             "Turns should alternate between X and O"
         );
 
-        board[space] = _getMarker();
-        prevMove = _getMarker();
+        games[id].board[space] = _getMarker(id);
+        games[id].prevMove = _getMarker(id);
+
+        uint256 _winner = winner(id);
+        if (_winner != 0) {
+            address winnerAddress = (_winner == X) ? games[id].playerX : games[id].playerO;
+            wins[winnerAddress]++;
+            points[winnerAddress] += POINTS_PER_WIN;
+        }
     }
 
-    function resetBoard() public isOwner {
-        delete board;
+    function resetBoard(uint256 id) public isOwner {
+        delete games[id].board;
     }
 
-    function getBoard() public view returns (uint256[9] memory) {
-        return board;
+    function getBoard(uint256 id) public view returns (uint256[9] memory) {
+        return games[id].board;
     }
 
-    function winner() public view returns (uint256) {
+    function winner(uint256 id) public view returns (uint256) {
         uint256[8] memory potentialWins = [
-            _rowWin(0),
-            _rowWin(1),
-            _rowWin(2),
-            _colWin(0),
-            _colWin(1),
-            _colWin(2),
-            _diagWin(),
-            _antiDiagWin()
+            _rowWin(id, 0),
+            _rowWin(id, 1),
+            _rowWin(id, 2),
+            _colWin(id, 0),
+            _colWin(id, 1),
+            _colWin(id, 2),
+            _diagWin(id),
+            _antiDiagWin(id)
         ];
         for (uint256 i; i < potentialWins.length; i++) {
             if (potentialWins[i] != 0) {
@@ -72,24 +89,24 @@ contract TicTacToken {
         return 0;
     }
 
-    function _rowWin(uint256 row) internal view returns (uint256) {
+    function _rowWin(uint256 id, uint256 row) internal view returns (uint256) {
         uint256 idx = row * 3;
-        uint256 product = board[idx] * board[idx + 1] * board[idx + 2];
+        uint256 product = games[id].board[idx] * games[id].board[idx + 1] * games[id].board[idx + 2];
         return _checkWin(product);
     }
 
-    function _colWin(uint256 col) internal view returns (uint256) {
-        uint256 product = board[col] * board[col + 3] * board[col + 6];
+    function _colWin(uint256 id, uint256 col) internal view returns (uint256) {
+        uint256 product = games[id].board[col] * games[id].board[col + 3] * games[id].board[col + 6];
         return _checkWin(product);
     }
 
-    function _diagWin() internal view returns (uint256) {
-        uint256 product = board[0] * board[4] * board[8];
+    function _diagWin(uint256 id) internal view returns (uint256) {
+        uint256 product = games[id].board[0] * games[id].board[4] * games[id].board[8];
         return _checkWin(product);
     }
 
-    function _antiDiagWin() internal view returns (uint256) {
-        uint256 product = board[2] * board[4] * board[6];
+    function _antiDiagWin(uint256 id) internal view returns (uint256) {
+        uint256 product = games[id].board[2] * games[id].board[4] * games[id].board[6];
         return _checkWin(product);
     }
 
@@ -103,9 +120,9 @@ contract TicTacToken {
         return 0;
     }
 
-    function _getMarker() internal view returns (uint256) {
-        if (msg.sender == playerX) return X;
-        if (msg.sender == playerO) return O;
+    function _getMarker(uint256 id) internal view returns (uint256) {
+        if (msg.sender == games[id].playerX) return X;
+        if (msg.sender == games[id].playerO) return O;
         return 0;
     }
 
@@ -117,11 +134,11 @@ contract TicTacToken {
         return marker == X || marker == O;
     }
 
-    function _emptySpace(uint256 space) internal view returns (bool) {
-        return board[space] == EMPTY;
+    function _emptySpace(uint256 id, uint256 space) internal view returns (bool) {
+        return games[id].board[space] == EMPTY;
     }
 
-    function _validTurn(uint256 nextMove) internal view returns (bool) {
-        return nextMove != prevMove;
+    function _validTurn(uint256 id, uint256 nextMove) internal view returns (bool) {
+        return nextMove != games[id].prevMove;
     }
 }

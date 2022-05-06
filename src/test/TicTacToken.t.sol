@@ -20,9 +20,9 @@ contract User {
         userAddress = _userAddress;
     }
 
-    function markSpace(uint256 space) public {
+    function markSpace(uint256 id, uint256 space) public {
         vm.prank(userAddress);
-        ttt.markSpace(space);
+        ttt.markSpace(id, space);
     }
 }
 
@@ -44,164 +44,203 @@ contract TestTicTacToken is DSTest {
     TicTacToken internal ttt;
 
     function setUp() public {
-        ttt = new TicTacToken(OWNER, PLAYER_X, PLAYER_O);
+        ttt = new TicTacToken(OWNER);
         playerX = new User(ttt, vm, PLAYER_X);
         playerO = new User(ttt, vm, PLAYER_O);
         nonPlayer = new User(ttt, vm, NON_PLAYER);
-    }
-
-    function test_first_square_of_board_is_empty() public {
-        assertEq(ttt.board(0), EMPTY);
-    }
-
-    function test_last_square_of_board_is_empty() public {
-        assertEq(ttt.board(8), EMPTY);
-    }
-
-    function test_full_board_starts_empty() public {
-        for (uint256 i; i < 9; i++) {
-            assertEq(ttt.board(i), EMPTY);
-        }
+        ttt.newGame(PLAYER_X, PLAYER_O);
     }
 
     function test_get_full_board() public {
-        uint256[9] memory board = ttt.getBoard();
+        uint256[9] memory board = ttt.getBoard(0);
         for (uint256 i; i < 9; i++) {
             assertEq(board[i], EMPTY);
         }
     }
 
     function test_marks_first_square_with_x() public {
-        playerX.markSpace(0);
-        uint256[9] memory board = ttt.getBoard();
+        playerX.markSpace(0, 0);
+        uint256[9] memory board = ttt.getBoard(0);
         assertEq(board[0], X);
     }
 
     function test_marks_first_square_with_o() public {
-        playerO.markSpace(0);
-        uint256[9] memory board = ttt.getBoard();
+        playerO.markSpace(0, 0);
+        uint256[9] memory board = ttt.getBoard(0);
         assertEq(board[0], O);
     }
 
     function test_cannot_overwrite_marked_square() public {
-        playerX.markSpace(2);
+        playerX.markSpace(0, 2);
 
         vm.expectRevert("Space already occupied");
-        playerO.markSpace(2);
+        playerO.markSpace(0, 2);
     }
 
     function test_validates_marker_is_valid_index() public {
         vm.expectRevert("Invalid space");
-        playerX.markSpace(9);
+        playerX.markSpace(0, 9);
     }
 
     function test_validates_alternating_turns_with_x() public {
-        playerX.markSpace(0);
+        playerX.markSpace(0, 0);
 
         vm.expectRevert("Turns should alternate between X and O");
-        playerX.markSpace(1);
+        playerX.markSpace(0, 1);
     }
 
     function test_validates_alternating_turns_with_o() public {
-        playerO.markSpace(0);
+        playerO.markSpace(0, 0);
 
         vm.expectRevert("Turns should alternate between X and O");
-        playerO.markSpace(1);
+        playerO.markSpace(0, 1);
     }
 
     function test_checks_diagonal_win() public {
-        playerX.markSpace(0);
-        playerO.markSpace(1);
-        playerX.markSpace(4);
-        playerO.markSpace(2);
-        playerX.markSpace(8);
+        playerX.markSpace(0, 0);
+        playerO.markSpace(0, 1);
+        playerX.markSpace(0, 4);
+        playerO.markSpace(0, 2);
+        playerX.markSpace(0, 8);
 
-        assertEq(ttt.winner(), X);
+        assertEq(ttt.winner(0), X);
     }
 
     function test_checks_antidiagonal_win() public {
-        playerX.markSpace(6);
-        playerO.markSpace(1);
-        playerX.markSpace(4);
-        playerO.markSpace(3);
-        playerX.markSpace(2);
+        playerX.markSpace(0, 6);
+        playerO.markSpace(0, 1);
+        playerX.markSpace(0, 4);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 2);
 
-        assertEq(ttt.winner(), X);
+        assertEq(ttt.winner(0), X);
     }
 
     function test_checks_column_win() public {
-        playerO.markSpace(0);
-        playerX.markSpace(1);
-        playerO.markSpace(3);
-        playerX.markSpace(2);
-        playerO.markSpace(6);
+        playerO.markSpace(0, 0);
+        playerX.markSpace(0, 1);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 2);
+        playerO.markSpace(0, 6);
 
-        assertEq(ttt.winner(), O);
+        assertEq(ttt.winner(0), O);
     }
 
     function test_checks_row_win() public {
-        playerX.markSpace(0);
-        playerO.markSpace(3);
-        playerX.markSpace(1);
-        playerO.markSpace(4);
-        playerX.markSpace(2);
+        playerX.markSpace(0, 0);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 1);
+        playerO.markSpace(0, 4);
+        playerX.markSpace(0, 2);
 
-        assertEq(ttt.winner(), X);
+        assertEq(ttt.winner(0), X);
     }
 
     function test_checks_row_win2() public {
-        playerO.markSpace(0);
-        playerX.markSpace(3);
-        playerO.markSpace(1);
-        playerX.markSpace(4);
-        playerO.markSpace(2);
+        playerO.markSpace(0, 0);
+        playerX.markSpace(0, 3);
+        playerO.markSpace(0, 1);
+        playerX.markSpace(0, 4);
+        playerO.markSpace(0, 2);
 
-        assertEq(ttt.winner(), O);
+        assertEq(ttt.winner(0), O);
     }
 
     function test_checks_row_win3() public {
-        playerO.markSpace(6);
-        playerX.markSpace(3);
-        playerO.markSpace(7);
-        playerX.markSpace(4);
-        playerO.markSpace(8);
+        playerO.markSpace(0, 6);
+        playerX.markSpace(0, 3);
+        playerO.markSpace(0, 7);
+        playerX.markSpace(0, 4);
+        playerO.markSpace(0, 8);
 
-        assertEq(ttt.winner(), O);
+        assertEq(ttt.winner(0), O);
     }
 
     function test_checks_tie() public {
-        playerX.markSpace(0);
-        playerO.markSpace(1);
-        playerX.markSpace(2);
-        playerO.markSpace(3);
-        playerX.markSpace(4);
-        playerO.markSpace(5);
-        playerX.markSpace(7);
-        playerO.markSpace(6);
+        playerX.markSpace(0, 0);
+        playerO.markSpace(0, 1);
+        playerX.markSpace(0, 2);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 4);
+        playerO.markSpace(0, 5);
+        playerX.markSpace(0, 7);
+        playerO.markSpace(0, 6);
 
-        assertEq(ttt.winner(), 0);
+        assertEq(ttt.winner(0), 0);
     }
 
     function test_non_owner_cannot_reset_board() public {
         vm.expectRevert("Unauthorized");
-        ttt.resetBoard();
+        ttt.resetBoard(0);
     }
 
     function test_owner_can_reset_board() public {
         vm.prank(OWNER);
-        ttt.resetBoard();
+        ttt.resetBoard(0);
     }
 
     function test_auth_non_player_cannot_mark_board() public {
         vm.expectRevert("Unauthorized");
-        nonPlayer.markSpace(0);
+        nonPlayer.markSpace(0, 0);
     }
 
     function test_auth_playerX_can_mark_board() public {
-        playerX.markSpace(0);
+        playerX.markSpace(0, 0);
     }
 
     function test_auth_playerO_can_mark_board() public {
-        playerO.markSpace(0);
+        playerO.markSpace(0, 0);
+    }
+
+    function test_create_new_game() public {
+        ttt.newGame(PLAYER_X, PLAYER_O);
+        playerX.markSpace(1, 0);
+        assertEq(ttt.getBoard(1)[0], X);
+
+        ttt.newGame(PLAYER_X, PLAYER_O);
+        playerX.markSpace(2, 0);
+        assertEq(ttt.getBoard(2)[0], X);
+    }
+
+    function test_tracks_wins_by_address() public {
+        assertEq(ttt.wins(PLAYER_X), 0);
+
+        playerX.markSpace(0, 0);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 1);
+        playerO.markSpace(0, 4);
+        playerX.markSpace(0, 2);
+
+        assertEq(ttt.wins(PLAYER_X), 1);
+
+        ttt.newGame(PLAYER_X, PLAYER_O);
+        playerO.markSpace(1, 6);
+        playerX.markSpace(1, 3);
+        playerO.markSpace(1, 7);
+        playerX.markSpace(1, 4);
+        playerO.markSpace(1, 8);
+
+        assertEq(ttt.wins(PLAYER_O), 1);
+
+        ttt.newGame(PLAYER_X, PLAYER_O);
+        playerX.markSpace(2, 0);
+        playerO.markSpace(2, 3);
+        playerX.markSpace(2, 1);
+        playerO.markSpace(2, 4);
+        playerX.markSpace(2, 2);
+
+        assertEq(ttt.wins(PLAYER_X), 2);
+    }
+
+    function test_tracks_points_by_address() public {
+        assertEq(ttt.points(PLAYER_X), 0);
+
+        playerX.markSpace(0, 0);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 1);
+        playerO.markSpace(0, 4);
+        playerX.markSpace(0, 2);
+
+        assertEq(ttt.points(PLAYER_X), 5);
     }
 }
