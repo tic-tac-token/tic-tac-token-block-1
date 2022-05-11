@@ -3,6 +3,8 @@ pragma solidity 0.8.10;
 
 import "ds-test/test.sol";
 import "forge-std/Vm.sol";
+
+import "../Token.sol";
 import "../TicTacToken.sol";
 
 contract User {
@@ -41,14 +43,17 @@ contract TestTicTacToken is DSTest {
     User internal nonPlayer;
 
     Vm public constant vm = Vm(HEVM_ADDRESS);
+    Token internal token;
     TicTacToken internal ttt;
 
     function setUp() public {
-        ttt = new TicTacToken(OWNER);
+        token = new Token();
+        ttt = new TicTacToken(OWNER, address(token));
         playerX = new User(ttt, vm, PLAYER_X);
         playerO = new User(ttt, vm, PLAYER_O);
         nonPlayer = new User(ttt, vm, NON_PLAYER);
         ttt.newGame(PLAYER_X, PLAYER_O);
+        token.transferOwnership(address(ttt));
     }
 
     function test_get_full_board() public {
@@ -233,7 +238,7 @@ contract TestTicTacToken is DSTest {
     }
 
     function test_tracks_points_by_address() public {
-        assertEq(ttt.points(PLAYER_X), 0);
+        assertEq(token.balanceOf(PLAYER_X), 0);
 
         playerX.markSpace(0, 0);
         playerO.markSpace(0, 3);
@@ -241,6 +246,22 @@ contract TestTicTacToken is DSTest {
         playerO.markSpace(0, 4);
         playerX.markSpace(0, 2);
 
-        assertEq(ttt.points(PLAYER_X), 5);
+        assertEq(token.balanceOf(PLAYER_X), 5 ether);
+    }
+
+    function test_has_token() public {
+        assertEq(address(ttt.token()), address(token));
+    }
+
+    function test_tracks_tokens_by_address() public {
+        assertEq(token.balanceOf(PLAYER_X), 0);
+
+        playerX.markSpace(0, 0);
+        playerO.markSpace(0, 3);
+        playerX.markSpace(0, 1);
+        playerO.markSpace(0, 4);
+        playerX.markSpace(0, 2);
+
+        assertEq(token.balanceOf(PLAYER_X), 5 ether);
     }
 }

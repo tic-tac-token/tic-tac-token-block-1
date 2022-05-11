@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity 0.8.10;
 
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+
+interface IToken is IERC20 {
+    function mint(address to, uint256 amount) external;
+}
+
 contract TicTacToken {
     uint256 public constant EMPTY = 0;
     uint256 public constant X = 1;
@@ -8,6 +14,7 @@ contract TicTacToken {
     uint256 internal constant POINTS_PER_WIN = 5;
 
     address public owner;
+    IToken public token;
     uint256 internal nextGameId;
 
     struct Game {
@@ -19,12 +26,13 @@ contract TicTacToken {
 
     mapping(uint256 => Game) public games;
     mapping(address => uint256) public wins;
-    mapping(address => uint256) public points;
 
     constructor(
-        address _owner
+        address _owner,
+        address _token
     ) {
         owner = _owner;
+        token = IToken(_token);
     }
 
     modifier isPlayer() {
@@ -58,7 +66,7 @@ contract TicTacToken {
         if (_winner != 0) {
             address winnerAddress = (_winner == X) ? games[id].playerX : games[id].playerO;
             wins[winnerAddress]++;
-            points[winnerAddress] += POINTS_PER_WIN;
+            token.mint(winnerAddress, POINTS_PER_WIN * 1 ether);
         }
     }
 
