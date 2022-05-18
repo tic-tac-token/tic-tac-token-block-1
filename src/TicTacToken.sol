@@ -2,9 +2,14 @@
 pragma solidity 0.8.10;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 
 interface IToken is IERC20 {
     function mint(address to, uint256 amount) external;
+}
+
+interface INFT is IERC721 {
+    function mint(address to, uint256 tokenId) external;
 }
 
 contract TicTacToken {
@@ -15,6 +20,7 @@ contract TicTacToken {
 
     address public owner;
     IToken public token;
+    INFT public nft;
     uint256 internal nextGameId;
 
     struct Game {
@@ -29,10 +35,12 @@ contract TicTacToken {
 
     constructor(
         address _owner,
-        address _token
+        address _token,
+        address _nft
     ) {
         owner = _owner;
         token = IToken(_token);
+        nft = INFT(_nft);
     }
 
     modifier isPlayer() {
@@ -49,6 +57,14 @@ contract TicTacToken {
         games[nextGameId].playerX = playerX;
         games[nextGameId].playerO = playerO;
         nextGameId++;
+
+        (uint256 xTokenId, uint256 oTokenId) = tokenIds(nextGameId);
+        nft.mint(playerX, xTokenId);
+        nft.mint(playerO, oTokenId);
+    }
+
+    function tokenIds(uint256 gameId) public pure returns (uint256, uint256) {
+       return (2 * gameId - 1, 2 * gameId);
     }
 
     function markSpace(uint256 id, uint256 space) public isPlayer {

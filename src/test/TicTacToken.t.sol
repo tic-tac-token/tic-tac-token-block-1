@@ -4,6 +4,7 @@ pragma solidity 0.8.10;
 import "ds-test/test.sol";
 import "forge-std/Vm.sol";
 
+import "../NFT.sol";
 import "../Token.sol";
 import "../TicTacToken.sol";
 
@@ -44,16 +45,20 @@ contract TestTicTacToken is DSTest {
 
     Vm public constant vm = Vm(HEVM_ADDRESS);
     Token internal token;
+    NFT internal nft;
     TicTacToken internal ttt;
 
     function setUp() public {
         token = new Token();
-        ttt = new TicTacToken(OWNER, address(token));
+        nft = new NFT();
+        ttt = new TicTacToken(OWNER, address(token), address(nft));
+        token.transferOwnership(address(ttt));
+        nft.transferOwnership(address(ttt));
+
         playerX = new User(ttt, vm, PLAYER_X);
         playerO = new User(ttt, vm, PLAYER_O);
         nonPlayer = new User(ttt, vm, NON_PLAYER);
         ttt.newGame(PLAYER_X, PLAYER_O);
-        token.transferOwnership(address(ttt));
     }
 
     function test_get_full_board() public {
@@ -205,6 +210,28 @@ contract TestTicTacToken is DSTest {
         ttt.newGame(PLAYER_X, PLAYER_O);
         playerX.markSpace(2, 0);
         assertEq(ttt.getBoard(2)[0], X);
+    }
+
+    function test_creating_game_issues_tokens_to_players() public {
+        assertEq(nft.balanceOf(PLAYER_X), 1);
+        assertEq(nft.ownerOf(1), PLAYER_X);
+
+        assertEq(nft.balanceOf(PLAYER_O), 1);
+        assertEq(nft.ownerOf(2), PLAYER_O);
+    }
+
+    function test_token_ids_are_function_of_game_ids() public {
+        (uint256 xTokenId, uint256 oTokenId) = ttt.tokenIds(1);
+        assertEq(xTokenId, 1);
+        assertEq(oTokenId, 2);
+
+        (xTokenId, oTokenId) = ttt.tokenIds(2);
+        assertEq(xTokenId, 3);
+        assertEq(oTokenId, 4);
+
+        (xTokenId, oTokenId) = ttt.tokenIds(3);
+        assertEq(xTokenId, 5);
+        assertEq(oTokenId, 6);
     }
 
     function test_tracks_wins_by_address() public {
