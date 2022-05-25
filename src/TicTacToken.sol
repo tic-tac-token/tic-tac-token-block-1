@@ -44,7 +44,10 @@ contract TicTacToken {
     }
 
     modifier isPlayer() {
-        require(msg.sender == games[0].playerX || msg.sender == games[0].playerO, "Unauthorized");
+        require(
+            msg.sender == games[0].playerX || msg.sender == games[0].playerO,
+            "Unauthorized"
+        );
         _;
     }
 
@@ -64,7 +67,7 @@ contract TicTacToken {
     }
 
     function tokenIds(uint256 gameId) public pure returns (uint256, uint256) {
-       return (2 * gameId - 1, 2 * gameId);
+        return (2 * gameId - 1, 2 * gameId);
     }
 
     function markSpace(uint256 id, uint256 space) public isPlayer {
@@ -80,7 +83,9 @@ contract TicTacToken {
 
         uint256 _winner = winner(id);
         if (_winner != 0) {
-            address winnerAddress = (_winner == X) ? games[id].playerX : games[id].playerO;
+            address winnerAddress = (_winner == X)
+                ? games[id].playerX
+                : games[id].playerO;
             wins[winnerAddress]++;
             token.mint(winnerAddress, POINTS_PER_WIN * 1 ether);
         }
@@ -115,22 +120,30 @@ contract TicTacToken {
 
     function _rowWin(uint256 id, uint256 row) internal view returns (uint256) {
         uint256 idx = row * 3;
-        uint256 product = games[id].board[idx] * games[id].board[idx + 1] * games[id].board[idx + 2];
+        uint256 product = games[id].board[idx] *
+            games[id].board[idx + 1] *
+            games[id].board[idx + 2];
         return _checkWin(product);
     }
 
     function _colWin(uint256 id, uint256 col) internal view returns (uint256) {
-        uint256 product = games[id].board[col] * games[id].board[col + 3] * games[id].board[col + 6];
+        uint256 product = games[id].board[col] *
+            games[id].board[col + 3] *
+            games[id].board[col + 6];
         return _checkWin(product);
     }
 
     function _diagWin(uint256 id) internal view returns (uint256) {
-        uint256 product = games[id].board[0] * games[id].board[4] * games[id].board[8];
+        uint256 product = games[id].board[0] *
+            games[id].board[4] *
+            games[id].board[8];
         return _checkWin(product);
     }
 
     function _antiDiagWin(uint256 id) internal view returns (uint256) {
-        uint256 product = games[id].board[2] * games[id].board[4] * games[id].board[6];
+        uint256 product = games[id].board[2] *
+            games[id].board[4] *
+            games[id].board[6];
         return _checkWin(product);
     }
 
@@ -158,11 +171,19 @@ contract TicTacToken {
         return marker == X || marker == O;
     }
 
-    function _emptySpace(uint256 id, uint256 space) internal view returns (bool) {
+    function _emptySpace(uint256 id, uint256 space)
+        internal
+        view
+        returns (bool)
+    {
         return games[id].board[space] == EMPTY;
     }
 
-    function _validTurn(uint256 id, uint256 nextMove) internal view returns (bool) {
+    function _validTurn(uint256 id, uint256 nextMove)
+        internal
+        view
+        returns (bool)
+    {
         return nextMove != games[id].prevMove;
     }
 }
