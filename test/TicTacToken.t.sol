@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-import "forge-std/Vm.sol";
+import "../lib/ds-test/src/test.sol";
+import "../lib/forge-std/src/Vm.sol";
 
-import "../NFT.sol";
-import "../Token.sol";
-import "../TicTacToken.sol";
+import "../contracts/NFT.sol";
+import "../contracts/Token.sol";
+import "../contracts/TicTacToken.sol";
 
 contract User {
     TicTacToken internal ttt;

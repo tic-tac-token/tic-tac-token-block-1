@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-import "forge-std/Vm.sol";
+import "../lib/ds-test/src/test.sol";
+import "../lib/forge-std/src/Vm.sol";
 
-import "../Token.sol";
+import "../contracts/Token.sol";
 
 contract TestToken is DSTest {
     Token internal token;

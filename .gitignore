@@ -3,3 +3,10 @@ out/
 node_modules/
 
 yarn-error.log
+
+.env
+
+# Hardhat
+artifacts/
+cache/
+typechain/

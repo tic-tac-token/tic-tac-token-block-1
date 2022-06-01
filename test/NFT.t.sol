@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-import "forge-std/Vm.sol";
+import "../lib/ds-test/src/test.sol";
+import "../lib/forge-std/src/Vm.sol";
 
-import "openzeppelin-contracts/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "../NFT.sol";
-import "../Token.sol";
-import "../TicTacToken.sol";
+import "../lib/openzeppelin-contracts/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "../contracts/NFT.sol";
+import "../contracts/Token.sol";
+import "../contracts/TicTacToken.sol";
 
 contract MockGame {
     mapping(uint256 => uint256[9]) internal _boards;
@@ -68,7 +68,7 @@ contract TestNFT is DSTest, ERC721Holder {
         nft.mint(address(this), 1);
         assertEq(
             nft.tokenURI(1),
-            "data:application/json;base64,eyJuYW1lIjoiR2FtZSAjMSIsImRlc2NyaXB0aW9uIjoiVGljLVRhYy1Ub2tlbiIsImltYWdlIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhCeVpYTmxjblpsUVhOd1pXTjBVbUYwYVc4OUluaE5hVzVaVFdsdUlHMWxaWFFpSUhacFpYZENiM2c5SWpBZ01DQXpOVEFnTXpVd0lqNDhjM1I1YkdVK0xuUmxlSFI3Wm05dWRDMW1ZVzFwYkhrNmJXOXViM053WVdObE8yWnZiblF0YzJsNlpUbzBPSEIwTzJ4bGRIUmxjaTF6Y0dGamFXNW5PaTR5TldWdE8yWnBiR3c2ZDJocGRHVjlQQzl6ZEhsc1pUNDhjbVZqZENCM2FXUjBhRDBpTVRBd0pTSWdhR1ZwWjJoMFBTSXhNREFsSWlCbWFXeHNQU0lqWmpCbU9XWm1JaTgrUEhSbGVIUWdlRDBpTlRBbElpQjVQU0l5TlNVaUlHTnNZWE56UFNKMFpYaDBJaUJrYjIxcGJtRnVkQzFpWVhObGJHbHVaVDBpYldsa1pHeGxJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsSWo0Z0lDQThMM1JsZUhRK1BIUmxlSFFnZUQwaU5UQWxJaUI1UFNJMU1DVWlJR05zWVhOelBTSjBaWGgwSWlCa2IyMXBibUZ1ZEMxaVlYTmxiR2x1WlQwaWJXbGtaR3hsSWlCMFpYaDBMV0Z1WTJodmNqMGliV2xrWkd4bElqNGdJQ0E4TDNSbGVIUStQSFJsZUhRZ2VEMGlOVEFsSWlCNVBTSTNOU1VpSUdOc1lYTnpQU0owWlhoMElpQmtiMjFwYm1GdWRDMWlZWE5sYkdsdVpUMGliV2xrWkd4bElpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJajRnSUNBOEwzUmxlSFErUEM5emRtYysifQ=="
+            "data:application/json;base64,eyJuYW1lIjoiR2FtZSAjMSIsImRlc2NyaXB0aW9uIjoiVGljLVRhYy1Ub2tlbiIsImltYWdlIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhCeVpYTmxjblpsUVhOd1pXTjBVbUYwYVc4OUluaE5hVzVaVFdsdUlHMWxaWFFpSUhacFpYZENiM2c5SWpBZ01DQXpOVEFnTXpVd0lqNDhjM1I1YkdVK0xuUmxlSFI3Wm05dWRDMW1ZVzFwYkhrNmJXOXViM053WVdObE8yWnZiblF0YzJsNlpUbzBPSEIwTzJ4bGRIUmxjaTF6Y0dGamFXNW5PaTR5TldWdE8yWnBiR3c2SXpRM05UVTJPWDA4TDNOMGVXeGxQanh5WldOMElIZHBaSFJvUFNJeE1EQWxJaUJvWldsbmFIUTlJakV3TUNVaUlHWnBiR3c5SWlObU1HWTVabVlpTHo0OGRHVjRkQ0I0UFNJMU1DVWlJSGs5SWpJMUpTSWdZMnhoYzNNOUluUmxlSFFpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaVBpQWdJRHd2ZEdWNGRENDhkR1Y0ZENCNFBTSTFNQ1VpSUhrOUlqVXdKU0lnWTJ4aGMzTTlJblJsZUhRaUlHUnZiV2x1WVc1MExXSmhjMlZzYVc1bFBTSnRhV1JrYkdVaUlIUmxlSFF0WVc1amFHOXlQU0p0YVdSa2JHVWlQaUFnSUR3dmRHVjRkRDQ4ZEdWNGRDQjRQU0kxTUNVaUlIazlJamMxSlNJZ1kyeGhjM005SW5SbGVIUWlJR1J2YldsdVlXNTBMV0poYzJWc2FXNWxQU0p0YVdSa2JHVWlJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpUGlBZ0lEd3ZkR1Y0ZEQ0OEwzTjJaejQ9In0="
         );
     }
 
@@ -97,7 +97,7 @@ contract TestNFT is DSTest, ERC721Holder {
         string memory game1svg = string(
             abi.encodePacked(
                 '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
-                "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:white}</style>",
+                "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
                 '<rect width="100%" height="100%" fill="#f0f9ff"/>',
                 '<text x="50%" y="25%" class="text" dominant-baseline="middle" text-anchor="middle">',
                 " X ",
@@ -126,10 +126,6 @@ contract TestNFT is DSTest, ERC721Holder {
             nft.tokenJSON(2),
             game1json
         );
-        //assertEq(
-        //    nft.tokenJSON(3),
-        //    '{"name":"Game #2","description":"Tic-Tac-Token","image":""}'
-        //);
     }
 
     function test_token_has_svg() public {
@@ -140,7 +136,7 @@ contract TestNFT is DSTest, ERC721Holder {
         string memory svg = string(
             abi.encodePacked(
                 '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
-                "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:white}</style>",
+                "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
                 '<rect width="100%" height="100%" fill="#f0f9ff"/>',
                 '<text x="50%" y="25%" class="text" dominant-baseline="middle" text-anchor="middle">',
                 " X ",
