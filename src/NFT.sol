@@ -6,23 +6,52 @@ import "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "openzeppelin-contracts/contracts/utils/Strings.sol";
 import "openzeppelin-contracts/contracts/utils/Base64.sol";
 
+library Encoding {
+
+    function toDataURI(string memory data,  string memory mimeType) internal pure returns (string memory) {
+            return string(
+                abi.encodePacked(
+                    "data:",
+                    mimeType,
+                    ";base64,",
+                    Base64.encode(abi.encodePacked(data))
+                )
+            );
+    }
+
+}
+
 interface IGame {
     function getBoard(uint256 id) external view returns (uint256[9] memory);
 }
 
 contract NFT is ERC721, Ownable {
     using Strings for uint256;
+    using Encoding for string;
 
     mapping(uint256 => address) public gameByTokenId;
+    string[6] colors = [
+       "#f0f9ff",
+       "#ecfdf5",
+       "#fefce8",
+       "#fff7ed",
+       "#fef2f2",
+       "#faf5ff"
+    ];
 
     constructor() ERC721("Tic-Tac-Token NFT", "NFT") {}
+
+    modifier tokenExists(uint256 tokenId) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        _;
+    }
 
     function mint(address to, uint256 tokenId) public onlyOwner {
         gameByTokenId[tokenId] = msg.sender;
         _safeMint(to, tokenId);
     }
 
-    function tokenSVG(uint256 tokenId) public view returns (string memory) {
+    function tokenSVG(uint256 tokenId) public view tokenExists(tokenId) returns (string memory) {
         uint256 gameId = _gameId(tokenId);
         IGame game = IGame(gameByTokenId[tokenId]);
         uint256[9] memory board = game.getBoard(gameId);
@@ -31,14 +60,47 @@ contract NFT is ERC721, Ownable {
             string(
                 abi.encodePacked(
                     '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
-                    "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:white}</style>",
-                    '<rect width="100%" height="100%" fill="#f0f9ff"/>',
+                    "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
+                    '<rect width="100%" height="100%" fill="',
+                    _getColor(tokenId),
+                    '"/>',
                     _renderRow(0, board),
                     _renderRow(1, board),
                     _renderRow(2, board),
                     "</svg>"
                 )
             );
+    }
+
+    function tokenJSON(uint256 tokenId) public view tokenExists(tokenId) returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    '{"name":"',
+                    _tokenName(tokenId),
+                    '","description":"Tic-Tac-Token","image":"',
+                    tokenSVG(tokenId).toDataURI("image/svg+xml"),
+                    '"}'
+                )
+            );
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override
+        tokenExists(tokenId)
+        returns (string memory)
+    {
+        return tokenJSON(tokenId).toDataURI("application/json");
+    }
+
+    function _getColor(uint256 tokenId) internal view returns (string memory) {
+       return colors[colors.length % tokenId];
+    }
+
+    function _tokenName(uint256 tokenId) internal pure returns (string memory) {
+        return string(abi.encodePacked("Game #", _gameId(tokenId).toString()));
     }
 
     function _renderRow(uint256 row, uint256[9] memory board)
@@ -62,33 +124,6 @@ contract NFT is ERC721, Ownable {
             );
     }
 
-    function tokenJSON(uint256 tokenId) public view returns (string memory) {
-        return
-            string(
-                abi.encodePacked(
-                    '{"name":"',
-                    _tokenName(tokenId),
-                    '","description":"Tic-Tac-Token","image":"',
-                    "",
-                    '"}'
-                )
-            );
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
-        return
-            string(
-                abi.encodePacked(
-                    "data:application/json;base64,",
-                    Base64.encode(abi.encodePacked(tokenJSON(tokenId)))
-                )
-            );
-    }
 
     function _toSymbol(uint256 marker) internal pure returns (string memory) {
         if (marker == 1) {
@@ -98,10 +133,6 @@ contract NFT is ERC721, Ownable {
         } else {
             return " ";
         }
-    }
-
-    function _tokenName(uint256 tokenId) internal view returns (string memory) {
-        return string(abi.encodePacked("Game #", _gameId(tokenId).toString()));
     }
 
     function _gameId(uint256 tokenId) public pure returns (uint256) {
