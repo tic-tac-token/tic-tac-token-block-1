@@ -32,6 +32,7 @@ contract TicTacToken {
 
     mapping(uint256 => Game) public games;
     mapping(address => uint256) public wins;
+    mapping(address => uint256[]) internal _gamesByPlayer;
 
     constructor(
         address _owner,
@@ -43,9 +44,9 @@ contract TicTacToken {
         nft = INFT(_nft);
     }
 
-    modifier isPlayer() {
+    modifier isPlayer(uint256 id) {
         require(
-            msg.sender == games[0].playerX || msg.sender == games[0].playerO,
+            msg.sender == games[id].playerX || msg.sender == games[id].playerO,
             "Unauthorized"
         );
         _;
@@ -59,6 +60,8 @@ contract TicTacToken {
     function newGame(address playerX, address playerO) public {
         games[nextGameId].playerX = playerX;
         games[nextGameId].playerO = playerO;
+        _gamesByPlayer[playerX].push(nextGameId);
+        _gamesByPlayer[playerO].push(nextGameId);
         nextGameId++;
 
         (uint256 xTokenId, uint256 oTokenId) = tokenIds(nextGameId);
@@ -66,11 +69,15 @@ contract TicTacToken {
         nft.mint(playerO, oTokenId);
     }
 
+    function gamesByPlayer(address player) public view returns (uint256[] memory) {
+        return _gamesByPlayer[player];
+    }
+
     function tokenIds(uint256 gameId) public pure returns (uint256, uint256) {
         return (2 * gameId - 1, 2 * gameId);
     }
 
-    function markSpace(uint256 id, uint256 space) public isPlayer {
+    function markSpace(uint256 id, uint256 space) public isPlayer(id) {
         require(_validSpace(space), "Invalid space");
         require(_emptySpace(id, space), "Space already occupied");
         require(

@@ -291,4 +291,17 @@ contract TestTicTacToken is DSTest {
 
         assertEq(token.balanceOf(PLAYER_X), 5 ether);
     }
+
+    function test_tracks_games_by_address() public {
+        ttt.newGame(PLAYER_X, PLAYER_O);
+        ttt.newGame(PLAYER_X, PLAYER_O);
+
+        uint256[3] memory expectedGameIds = [uint256(0), 1, 2];
+        uint256[] memory games = ttt.gamesByPlayer(PLAYER_X);
+
+        for (uint256 i; i < 3; i++) {
+            assertEq(games[i], expectedGameIds[i]);
+        }
+
+    }
 }
