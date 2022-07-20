@@ -24,7 +24,7 @@ const Board = ({ gameId }: Props) => {
       <h2 className="mb-4 text-2xl font-bold">Game #{gameId}</h2>
       <div className="grid items-center grid-cols-3 gap-6 justify-items-center">
         {formattedBoard &&
-          formattedBoard.map((space, idx) => (
+          formattedBoard.map((space: string, idx: number) => (
             <div
               key={idx}
               className="flex items-center justify-center w-full rounded-lg shadow-lg bg-purple-50 aspect-square hover:cursor-pointer hover:bg-purple-200"
