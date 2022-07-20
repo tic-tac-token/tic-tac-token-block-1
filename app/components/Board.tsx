@@ -39,7 +39,7 @@ const Board = ({ gameId }: Props) => {
       <div>Block: {block}</div>
       {isLoading && <p>Marking space...</p>}
       {isSuccess && <p>Marked!</p>}
-      {markSpaceError && <p>{markSpaceError.reason}</p>}
+      {markSpaceError && <p>{markSpaceError.toString()}</p>}
     </div>
   );
 };
