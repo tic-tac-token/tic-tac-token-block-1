@@ -3,16 +3,11 @@ pragma solidity 0.8.10;
 
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import "./interfaces/INFT.sol";
+import "./interfaces/IToken.sol";
+import "./interfaces/IGame.sol";
 
-interface IToken is IERC20 {
-    function mint(address to, uint256 amount) external;
-}
-
-interface INFT is IERC721 {
-    function mint(address to, uint256 tokenId) external;
-}
-
-contract TicTacToken {
+contract TicTacToken is IGame {
     uint256 public constant EMPTY = 0;
     uint256 public constant X = 1;
     uint256 public constant O = 2;
@@ -41,6 +36,9 @@ contract TicTacToken {
         address _token,
         address _nft
     ) {
+        require(_owner != address(0), "Zero owner");
+        require(_token != address(0), "Zero owner");
+        require(_nft != address(0), "Zero owner");
         owner = _owner;
         token = IToken(_token);
         nft = INFT(_nft);
@@ -60,13 +58,15 @@ contract TicTacToken {
     }
 
     function newGame(address playerX, address playerO) public {
+        require(playerX != address(0) && playerO != address(0), "Zero player");
+
         uint256 nextId = nextGameId;
         games[nextId].playerX = playerX;
         games[nextId].playerO = playerO;
         _gamesByPlayer[playerX].push(nextId);
         _gamesByPlayer[playerO].push(nextId);
-
         (uint256 xTokenId, uint256 oTokenId) = tokenIds(++nextGameId);
+
         nft.mint(playerX, xTokenId);
         nft.mint(playerO, oTokenId);
     }
@@ -118,10 +118,6 @@ contract TicTacToken {
         return bitMap | (uint16(1) << uint16(i));
     }
 
-    function resetBoard(uint256) public isOwner {
-        return;
-    }
-
     function getBoard(uint256 id) public view returns (uint256[9] memory) {
         Game memory game = games[id];
         uint256[9] memory boardArray;
@@ -159,10 +155,6 @@ contract TicTacToken {
 
     function _validSpace(uint256 space) internal pure returns (bool) {
         return space < 9;
-    }
-
-    function _validMarker(uint256 marker) internal pure returns (bool) {
-        return marker == X || marker == O;
     }
 
     function _emptySpace(uint256 id, uint256 space)

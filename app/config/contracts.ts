@@ -16,7 +16,11 @@ export const config = {
 };
 
 export const getConfig = (chain: Chain) => {
-  return config[chain.id];
+  if (config[chain.id]) {
+    return config[chain.id];
+  } else {
+    return config[hardhat.id];
+  }
 };
 
 export default config[polygonMumbai.id];

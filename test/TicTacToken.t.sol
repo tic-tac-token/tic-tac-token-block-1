@@ -179,16 +179,6 @@ contract TestTicTacToken is DSTest {
         assertEq(ttt.winner(0), 0);
     }
 
-    function test_non_owner_cannot_reset_board() public {
-        vm.expectRevert("Unauthorized");
-        ttt.resetBoard(0);
-    }
-
-    function test_owner_can_reset_board() public {
-        vm.prank(OWNER);
-        ttt.resetBoard(0);
-    }
-
     function test_auth_non_player_cannot_mark_board() public {
         vm.expectRevert("Unauthorized");
         nonPlayer.markSpace(0, 0);

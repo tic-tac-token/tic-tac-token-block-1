@@ -6,6 +6,9 @@ import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 
+import "./interfaces/INFT.sol";
+import "./interfaces/IGame.sol";
+
 library Encoding {
 
     function toDataURI(string memory data,  string memory mimeType) internal pure returns (string memory) {
@@ -21,11 +24,8 @@ library Encoding {
 
 }
 
-interface IGame {
-    function getBoard(uint256 id) external view returns (uint256[9] memory);
-}
 
-contract NFT is ERC721, Ownable {
+contract NFT is INFT, ERC721, Ownable {
     using Strings for uint256;
     using Encoding for string;
 
@@ -48,6 +48,7 @@ contract NFT is ERC721, Ownable {
 
     function mint(address to, uint256 tokenId) public onlyOwner {
         gameByTokenId[tokenId] = msg.sender;
+
         _safeMint(to, tokenId);
     }
 
