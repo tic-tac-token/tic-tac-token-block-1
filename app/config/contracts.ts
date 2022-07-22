@@ -1,8 +1,13 @@
 import { Chain, chain } from 'wagmi';
 
-const { polygonMumbai, hardhat } = chain;
+const { polygon, polygonMumbai, hardhat } = chain;
 
 export const config = {
+  [polygon.id]: {
+    game: "0x1B2478C8297a95C3c3a5C7Ce173d7Edb5F10dc96",
+    token: "0xB8EB2b0717B1c57536c5Fcb159dfA89Ab620000F",
+    nft: "0xe1F7678A608E6c3Ec8FFA02F913bb92042d43BDf",
+  },
   [polygonMumbai.id]: {
     game: "0x29bf075597526529789f3BCB2074aC2ADf602bDC",
     token: "0x048038894743d1ca62Ee0c04796c5FEEa8416322",

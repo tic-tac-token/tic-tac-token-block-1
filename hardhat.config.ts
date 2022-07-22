@@ -12,7 +12,15 @@ import { HardhatUserConfig, task } from 'hardhat/config';
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.15",
+  solidity: {
+    version: "0.8.15",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   networks: {
     hardhat: {
       mining: {
@@ -24,6 +32,12 @@ const config: HardhatUserConfig = {
       url: process.env.MUMBAI_RPC || "",
       accounts: {
         mnemonic: process.env.MUMBAI_MNEMONIC,
+      },
+    },
+    polygon: {
+      url: process.env.POLYGON_RPC || "",
+      accounts: {
+        mnemonic: process.env.POLYGON_MNEMONIC,
       },
     },
   },
