@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import "../lib/ds-test/src/test.sol";
 import "../lib/forge-std/src/Vm.sol";
@@ -34,7 +34,6 @@ contract TestTicTacToken is DSTest {
     uint256 public constant X = 1;
     uint256 public constant O = 2;
 
-    address public constant OWNER = address(1);
     address public constant PLAYER_X = address(2);
     address public constant PLAYER_O = address(3);
     address public constant NON_PLAYER = address(4);
@@ -51,7 +50,7 @@ contract TestTicTacToken is DSTest {
     function setUp() public {
         token = new Token();
         nft = new NFT();
-        ttt = new TicTacToken(OWNER, address(token), address(nft));
+        ttt = new TicTacToken(address(token), address(nft));
         token.transferOwnership(address(ttt));
         nft.transferOwnership(address(ttt));
 
@@ -83,7 +82,7 @@ contract TestTicTacToken is DSTest {
     function test_cannot_overwrite_marked_square() public {
         playerX.markSpace(0, 2);
 
-        vm.expectRevert("Space already occupied");
+        vm.expectRevert("Already occupied");
         playerO.markSpace(0, 2);
     }
 
@@ -95,14 +94,14 @@ contract TestTicTacToken is DSTest {
     function test_validates_alternating_turns_with_x() public {
         playerX.markSpace(0, 0);
 
-        vm.expectRevert("Turns should alternate between X and O");
+        vm.expectRevert("Not your turn");
         playerX.markSpace(0, 1);
     }
 
     function test_validates_alternating_turns_with_o() public {
         playerO.markSpace(0, 0);
 
-        vm.expectRevert("Turns should alternate between X and O");
+        vm.expectRevert("Not your turn");
         playerO.markSpace(0, 1);
     }
 
@@ -292,6 +291,5 @@ contract TestTicTacToken is DSTest {
         for (uint256 i; i < 3; i++) {
             assertEq(games[i], expectedGameIds[i]);
         }
-
     }
 }

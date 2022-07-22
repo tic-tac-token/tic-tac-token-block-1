@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import "../lib/ds-test/src/test.sol";
 import "../lib/forge-std/src/Vm.sol";
@@ -94,38 +94,28 @@ contract TestNFT is DSTest, ERC721Holder {
         nft.mint(address(this), 2);
         vm.stopPrank();
 
-        string memory game1svg = string(
-            abi.encodePacked(
-                '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
-                "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
-                '<rect width="100%" height="100%" fill="#f0f9ff"/>',
-                '<text x="50%" y="25%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                " X ",
-                "</text>",
-                '<text x="50%" y="50%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                " O ",
-                "</text>",
-                '<text x="50%" y="75%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                "XO ",
-                "</text>",
-                "</svg>"
-            )
+        string memory game1svg = string.concat(
+            '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
+            "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
+            '<rect width="100%" height="100%" fill="#f0f9ff"/>',
+            '<text x="50%" y="25%" class="text" dominant-baseline="middle" text-anchor="middle">',
+            " X ",
+            "</text>",
+            '<text x="50%" y="50%" class="text" dominant-baseline="middle" text-anchor="middle">',
+            " O ",
+            "</text>",
+            '<text x="50%" y="75%" class="text" dominant-baseline="middle" text-anchor="middle">',
+            "XO ",
+            "</text>",
+            "</svg>"
         );
-        string memory game1json = string(
-            abi.encodePacked(
-                '{"name":"Game #1","description":"Tic-Tac-Token","image":"',
-                Encoding.toDataURI(game1svg, "image/svg+xml"),
-                '"}'
-            )
+        string memory game1json = string.concat(
+            '{"name":"Game #1","description":"Tic-Tac-Token","image":"',
+            Encoding.toDataURI(game1svg, "image/svg+xml"),
+            '"}'
         );
-        assertEq(
-            nft.tokenJSON(1),
-            game1json
-        );
-        assertEq(
-            nft.tokenJSON(2),
-            game1json
-        );
+        assertEq(nft.tokenJSON(1), game1json);
+        assertEq(nft.tokenJSON(2), game1json);
     }
 
     function test_token_has_svg() public {
@@ -134,7 +124,7 @@ contract TestNFT is DSTest, ERC721Holder {
         nft.mint(address(this), 1);
 
         string memory svg = string(
-            abi.encodePacked(
+            string.concat(
                 '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
                 "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
                 '<rect width="100%" height="100%" fill="#f0f9ff"/>',

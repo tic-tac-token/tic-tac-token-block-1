@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import "../../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 

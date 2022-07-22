@@ -2,11 +2,9 @@ import { expect } from "chai";
 import hre, { ethers } from "hardhat";
 import { NFT, TicTacToken, Token } from "../typechain";
 
-
 describe("Deployment", function () {
-
   it("Deploys the contracts", async function () {
-    const { token, nft, ttt }  = await hre.run("deploy");
+    const { token, nft, ttt } = await hre.run("deploy");
     const [deployer] = await ethers.getSigners();
 
     expect(await token.name()).to.equal("Tic-Tac-Token");
@@ -18,6 +16,4 @@ describe("Deployment", function () {
 
     expect(await ttt.owner()).to.equal(deployer.address);
   });
-
-
 });

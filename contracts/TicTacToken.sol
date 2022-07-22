@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
@@ -13,7 +13,6 @@ contract TicTacToken is IGame {
     uint256 public constant O = 2;
     uint256 internal constant POINTS_PER_WIN = 5;
 
-    address public immutable owner;
     IToken public immutable token;
     INFT public immutable nft;
 
@@ -31,15 +30,9 @@ contract TicTacToken is IGame {
     mapping(address => uint256) public wins;
     mapping(address => uint256[]) internal _gamesByPlayer;
 
-    constructor(
-        address _owner,
-        address _token,
-        address _nft
-    ) {
-        require(_owner != address(0), "Zero owner");
-        require(_token != address(0), "Zero owner");
-        require(_nft != address(0), "Zero owner");
-        owner = _owner;
+    constructor(address _token, address _nft) {
+        require(_token != address(0), "Zero token");
+        require(_nft != address(0), "Zero NFT");
         token = IToken(_token);
         nft = INFT(_nft);
     }
@@ -52,13 +45,9 @@ contract TicTacToken is IGame {
         _;
     }
 
-    modifier isOwner() {
-        require(msg.sender == owner, "Unauthorized");
-        _;
-    }
-
     function newGame(address playerX, address playerO) public {
         require(playerX != address(0) && playerO != address(0), "Zero player");
+        require(playerX != playerO, "Cannot play self");
 
         uint256 nextId = nextGameId;
         games[nextId].playerX = playerX;
@@ -71,7 +60,11 @@ contract TicTacToken is IGame {
         nft.mint(playerO, oTokenId);
     }
 
-    function gamesByPlayer(address player) public view returns (uint256[] memory) {
+    function gamesByPlayer(address player)
+        public
+        view
+        returns (uint256[] memory)
+    {
         return _gamesByPlayer[player];
     }
 
@@ -81,11 +74,8 @@ contract TicTacToken is IGame {
 
     function markSpace(uint256 id, uint256 space) public isPlayer(id) {
         require(_validSpace(space), "Invalid space");
-        require(_emptySpace(id, space), "Space already occupied");
-        require(
-            _validTurn(id, _getMarker(id)),
-            "Turns should alternate between X and O"
-        );
+        require(_emptySpace(id, space), "Already occupied");
+        require(_validTurn(id, _getMarker(id)), "Not your turn");
 
         _setSymbol(id, space, _getMarker(id));
         games[id].prevMove = _getMarker(id);
@@ -100,7 +90,11 @@ contract TicTacToken is IGame {
         }
     }
 
-    function _setSymbol(uint256 gameId, uint256 i, uint256 symbol) internal {
+    function _setSymbol(
+        uint256 gameId,
+        uint256 i,
+        uint256 symbol
+    ) internal {
         Game storage game = games[gameId];
         if (symbol == X) {
             game.playerXBitmap = _setBit(game.playerXBitmap, i);
@@ -121,7 +115,7 @@ contract TicTacToken is IGame {
     function getBoard(uint256 id) public view returns (uint256[9] memory) {
         Game memory game = games[id];
         uint256[9] memory boardArray;
-        for (uint256 i=0; i < 9; ++i) {
+        for (uint256 i = 0; i < 9; ++i) {
             if (_readBit(game.playerXBitmap, i) != 0) {
                 boardArray[i] = X;
             }
@@ -137,7 +131,7 @@ contract TicTacToken is IGame {
         Game memory game = games[id];
         uint16 playerXBitmap = game.playerXBitmap;
         uint16 playerOBitmap = game.playerOBitmap;
-        for (uint256 i=0; i < WIN_ENCODINGS.length; ++i) {
+        for (uint256 i = 0; i < WIN_ENCODINGS.length; ++i) {
             if (WIN_ENCODINGS[i] == (playerXBitmap & WIN_ENCODINGS[i])) {
                 return X;
             } else if (WIN_ENCODINGS[i] == (playerOBitmap & WIN_ENCODINGS[i])) {
@@ -145,7 +139,7 @@ contract TicTacToken is IGame {
             }
         }
         return 0;
-     }
+    }
 
     function _getMarker(uint256 id) internal view returns (uint256) {
         if (msg.sender == games[id].playerX) return X;

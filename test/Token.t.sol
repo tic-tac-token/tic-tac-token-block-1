@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import "../lib/ds-test/src/test.sol";
 import "../lib/forge-std/src/Vm.sol";

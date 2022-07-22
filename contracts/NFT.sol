@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
@@ -10,20 +10,20 @@ import "./interfaces/INFT.sol";
 import "./interfaces/IGame.sol";
 
 library Encoding {
-
-    function toDataURI(string memory data,  string memory mimeType) internal pure returns (string memory) {
-            return string(
-                abi.encodePacked(
-                    "data:",
-                    mimeType,
-                    ";base64,",
-                    Base64.encode(abi.encodePacked(data))
-                )
+    function toDataURI(string memory data, string memory mimeType)
+        internal
+        pure
+        returns (string memory)
+    {
+        return
+            string.concat(
+                "data:",
+                mimeType,
+                ";base64,",
+                Base64.encode(abi.encodePacked(data))
             );
     }
-
 }
-
 
 contract NFT is INFT, ERC721, Ownable {
     using Strings for uint256;
@@ -31,18 +31,21 @@ contract NFT is INFT, ERC721, Ownable {
 
     mapping(uint256 => address) public gameByTokenId;
     string[6] colors = [
-       "#f0f9ff",
-       "#ecfdf5",
-       "#fefce8",
-       "#fff7ed",
-       "#fef2f2",
-       "#faf5ff"
+        "#f0f9ff",
+        "#ecfdf5",
+        "#fefce8",
+        "#fff7ed",
+        "#fef2f2",
+        "#faf5ff"
     ];
 
-    constructor() ERC721("Tic-Tac-Token NFT", "NFT") {}
+    constructor() ERC721("Tic-Tac-Token NFT (Block 0x1)", "TTT.1 NFT") {}
 
     modifier tokenExists(uint256 tokenId) {
-        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
         _;
     }
 
@@ -52,37 +55,43 @@ contract NFT is INFT, ERC721, Ownable {
         _safeMint(to, tokenId);
     }
 
-    function tokenSVG(uint256 tokenId) public view tokenExists(tokenId) returns (string memory) {
+    function tokenSVG(uint256 tokenId)
+        public
+        view
+        tokenExists(tokenId)
+        returns (string memory)
+    {
         uint256 gameId = _gameId(tokenId);
         IGame game = IGame(gameByTokenId[tokenId]);
         uint256[9] memory board = game.getBoard(gameId);
 
         return
-            string(
-                abi.encodePacked(
-                    '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
-                    "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
-                    '<rect width="100%" height="100%" fill="',
-                    _getColor(tokenId),
-                    '"/>',
-                    _renderRow(0, board),
-                    _renderRow(1, board),
-                    _renderRow(2, board),
-                    "</svg>"
-                )
+            string.concat(
+                '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
+                "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
+                '<rect width="100%" height="100%" fill="',
+                _getColor(tokenId),
+                '"/>',
+                _renderRow(0, board),
+                _renderRow(1, board),
+                _renderRow(2, board),
+                "</svg>"
             );
     }
 
-    function tokenJSON(uint256 tokenId) public view tokenExists(tokenId) returns (string memory) {
+    function tokenJSON(uint256 tokenId)
+        public
+        view
+        tokenExists(tokenId)
+        returns (string memory)
+    {
         return
-            string(
-                abi.encodePacked(
-                    '{"name":"',
-                    _tokenName(tokenId),
-                    '","description":"Tic-Tac-Token","image":"',
-                    tokenSVG(tokenId).toDataURI("image/svg+xml"),
-                    '"}'
-                )
+            string.concat(
+                '{"name":"',
+                _tokenName(tokenId),
+                '","description":"Tic-Tac-Token NFT (Block 0x1)","image":"',
+                tokenSVG(tokenId).toDataURI("image/svg+xml"),
+                '"}'
             );
     }
 
@@ -97,7 +106,7 @@ contract NFT is INFT, ERC721, Ownable {
     }
 
     function _getColor(uint256 tokenId) internal view returns (string memory) {
-       return colors[colors.length % tokenId];
+        return colors[colors.length % tokenId];
     }
 
     function _tokenName(uint256 tokenId) internal pure returns (string memory) {
@@ -112,19 +121,16 @@ contract NFT is INFT, ERC721, Ownable {
         uint256 offset = (row + 1) * 25;
         uint256 idx = row * 3;
         return
-            string(
-                abi.encodePacked(
-                    '<text x="50%" y="',
-                    offset.toString(),
-                    '%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                    _toSymbol(board[idx]),
-                    _toSymbol(board[idx + 1]),
-                    _toSymbol(board[idx + 2]),
-                    "</text>"
-                )
+            string.concat(
+                '<text x="50%" y="',
+                offset.toString(),
+                '%" class="text" dominant-baseline="middle" text-anchor="middle">',
+                _toSymbol(board[idx]),
+                _toSymbol(board[idx + 1]),
+                _toSymbol(board[idx + 2]),
+                "</text>"
             );
     }
-
 
     function _toSymbol(uint256 marker) internal pure returns (string memory) {
         if (marker == 1) {
@@ -132,7 +138,7 @@ contract NFT is INFT, ERC721, Ownable {
         } else if (marker == 2) {
             return "O";
         } else {
-            return " ";
+            return "_";
         }
     }
 
