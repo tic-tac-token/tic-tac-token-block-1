@@ -37,11 +37,11 @@ contract TestNFT is DSTest, ERC721Holder {
     }
 
     function test_token_has_name() public {
-        assertEq(nft.name(), "Tic-Tac-Token NFT");
+        assertEq(nft.name(), "Tic-Tac-Token NFT (Block 0x1)");
     }
 
     function test_token_has_symbol() public {
-        assertEq(nft.symbol(), "NFT");
+        assertEq(nft.symbol(), "TTT.1 NFT");
     }
 
     function test_token_is_mintable() public {
@@ -68,7 +68,7 @@ contract TestNFT is DSTest, ERC721Holder {
         nft.mint(address(this), 1);
         assertEq(
             nft.tokenURI(1),
-            "data:application/json;base64,eyJuYW1lIjoiR2FtZSAjMSIsImRlc2NyaXB0aW9uIjoiVGljLVRhYy1Ub2tlbiIsImltYWdlIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhCeVpYTmxjblpsUVhOd1pXTjBVbUYwYVc4OUluaE5hVzVaVFdsdUlHMWxaWFFpSUhacFpYZENiM2c5SWpBZ01DQXpOVEFnTXpVd0lqNDhjM1I1YkdVK0xuUmxlSFI3Wm05dWRDMW1ZVzFwYkhrNmJXOXViM053WVdObE8yWnZiblF0YzJsNlpUbzBPSEIwTzJ4bGRIUmxjaTF6Y0dGamFXNW5PaTR5TldWdE8yWnBiR3c2SXpRM05UVTJPWDA4TDNOMGVXeGxQanh5WldOMElIZHBaSFJvUFNJeE1EQWxJaUJvWldsbmFIUTlJakV3TUNVaUlHWnBiR3c5SWlObU1HWTVabVlpTHo0OGRHVjRkQ0I0UFNJMU1DVWlJSGs5SWpJMUpTSWdZMnhoYzNNOUluUmxlSFFpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaVBpQWdJRHd2ZEdWNGRENDhkR1Y0ZENCNFBTSTFNQ1VpSUhrOUlqVXdKU0lnWTJ4aGMzTTlJblJsZUhRaUlHUnZiV2x1WVc1MExXSmhjMlZzYVc1bFBTSnRhV1JrYkdVaUlIUmxlSFF0WVc1amFHOXlQU0p0YVdSa2JHVWlQaUFnSUR3dmRHVjRkRDQ4ZEdWNGRDQjRQU0kxTUNVaUlIazlJamMxSlNJZ1kyeGhjM005SW5SbGVIUWlJR1J2YldsdVlXNTBMV0poYzJWc2FXNWxQU0p0YVdSa2JHVWlJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpUGlBZ0lEd3ZkR1Y0ZEQ0OEwzTjJaejQ9In0="
+            "data:application/json;base64,eyJuYW1lIjoiR2FtZSAjMSIsImRlc2NyaXB0aW9uIjoiVGljLVRhYy1Ub2tlbiBORlQgKEJsb2NrIDB4MSkiLCJpbWFnZSI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIQnlaWE5sY25abFFYTndaV04wVW1GMGFXODlJbmhOYVc1WlRXbHVJRzFsWlhRaUlIWnBaWGRDYjNnOUlqQWdNQ0F6TlRBZ016VXdJajQ4YzNSNWJHVStMblJsZUhSN1ptOXVkQzFtWVcxcGJIazZiVzl1YjNOd1lXTmxPMlp2Ym5RdGMybDZaVG8wT0hCME8yeGxkSFJsY2kxemNHRmphVzVuT2k0eU5XVnRPMlpwYkd3Nkl6UTNOVFUyT1gwOEwzTjBlV3hsUGp4eVpXTjBJSGRwWkhSb1BTSXhNREFsSWlCb1pXbG5hSFE5SWpFd01DVWlJR1pwYkd3OUlpTm1NR1k1Wm1ZaUx6NDhkR1Y0ZENCNFBTSTFNQ1VpSUhrOUlqSTFKU0lnWTJ4aGMzTTlJblJsZUhRaUlHUnZiV2x1WVc1MExXSmhjMlZzYVc1bFBTSnRhV1JrYkdVaUlIUmxlSFF0WVc1amFHOXlQU0p0YVdSa2JHVWlQbDlmWHp3dmRHVjRkRDQ4ZEdWNGRDQjRQU0kxTUNVaUlIazlJalV3SlNJZ1kyeGhjM005SW5SbGVIUWlJR1J2YldsdVlXNTBMV0poYzJWc2FXNWxQU0p0YVdSa2JHVWlJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpUGw5Zlh6d3ZkR1Y0ZEQ0OGRHVjRkQ0I0UFNJMU1DVWlJSGs5SWpjMUpTSWdZMnhoYzNNOUluUmxlSFFpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaVBsOWZYend2ZEdWNGRENDhMM04yWno0PSJ9"
         );
     }
 
@@ -99,23 +99,22 @@ contract TestNFT is DSTest, ERC721Holder {
             "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
             '<rect width="100%" height="100%" fill="#f0f9ff"/>',
             '<text x="50%" y="25%" class="text" dominant-baseline="middle" text-anchor="middle">',
-            " X ",
+            "_X_",
             "</text>",
             '<text x="50%" y="50%" class="text" dominant-baseline="middle" text-anchor="middle">',
-            " O ",
+            "_O_",
             "</text>",
             '<text x="50%" y="75%" class="text" dominant-baseline="middle" text-anchor="middle">',
-            "XO ",
+            "XO_",
             "</text>",
             "</svg>"
         );
         string memory game1json = string.concat(
-            '{"name":"Game #1","description":"Tic-Tac-Token","image":"',
+            '{"name":"Game #1","description":"Tic-Tac-Token NFT (Block 0x1)","image":"',
             Encoding.toDataURI(game1svg, "image/svg+xml"),
             '"}'
         );
         assertEq(nft.tokenJSON(1), game1json);
-        assertEq(nft.tokenJSON(2), game1json);
     }
 
     function test_token_has_svg() public {
@@ -129,13 +128,13 @@ contract TestNFT is DSTest, ERC721Holder {
                 "<style>.text{font-family:monospace;font-size:48pt;letter-spacing:.25em;fill:#475569}</style>",
                 '<rect width="100%" height="100%" fill="#f0f9ff"/>',
                 '<text x="50%" y="25%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                " X ",
+                "_X_",
                 "</text>",
                 '<text x="50%" y="50%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                " O ",
+                "_O_",
                 "</text>",
                 '<text x="50%" y="75%" class="text" dominant-baseline="middle" text-anchor="middle">',
-                "XO ",
+                "XO_",
                 "</text>",
                 "</svg>"
             )

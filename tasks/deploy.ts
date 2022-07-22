@@ -34,11 +34,7 @@ export const deployContracts = async (
 
   console.log("Deploying Game...");
   const TicTacToken = await ethers.getContractFactory("TicTacToken");
-  const ttt = await TicTacToken.deploy(
-    deployer.address,
-    token.address,
-    nft.address
-  );
+  const ttt = await TicTacToken.deploy(token.address, nft.address);
   await ttt.deployed();
   console.log("Game: ", ttt.address);
 
@@ -46,15 +42,15 @@ export const deployContracts = async (
   await token.transferOwnership(ttt.address);
   await nft.transferOwnership(ttt.address);
 
-  await network.provider.send("hardhat_setBalance", [
-    "0xe979054eB69F543298406447D8AB6CBBc5791307",
-    "0x8ac7230489e80000",
-  ]);
+  //await network.provider.send("hardhat_setBalance", [
+  //  "0xe979054eB69F543298406447D8AB6CBBc5791307",
+  //  "0x8ac7230489e80000",
+  //]);
 
-  await network.provider.send("hardhat_setBalance", [
-    "0x21AD28cb45192f61b2ce5403B2593c1816AB2310",
-    "0x8ac7230489e80000",
-  ]);
+  //await network.provider.send("hardhat_setBalance", [
+  //  "0x21AD28cb45192f61b2ce5403B2593c1816AB2310",
+  //  "0x8ac7230489e80000",
+  //]);
 
   return { token, nft, ttt };
 };

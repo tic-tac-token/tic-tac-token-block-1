@@ -49,12 +49,12 @@ contract TicTacToken is IGame {
         require(playerX != address(0) && playerO != address(0), "Zero player");
         require(playerX != playerO, "Cannot play self");
 
-        uint256 nextId = nextGameId;
-        games[nextId].playerX = playerX;
-        games[nextId].playerO = playerO;
-        _gamesByPlayer[playerX].push(nextId);
-        _gamesByPlayer[playerO].push(nextId);
-        (uint256 xTokenId, uint256 oTokenId) = tokenIds(++nextGameId);
+        uint256 id = ++nextGameId;
+        games[id].playerX = playerX;
+        games[id].playerO = playerO;
+        _gamesByPlayer[playerX].push(id);
+        _gamesByPlayer[playerO].push(id);
+        (uint256 xTokenId, uint256 oTokenId) = tokenIds(id);
 
         nft.mint(playerX, xTokenId);
         nft.mint(playerO, oTokenId);
@@ -76,12 +76,13 @@ contract TicTacToken is IGame {
         require(_validSpace(space), "Invalid space");
         require(_emptySpace(id, space), "Already occupied");
         require(_validTurn(id, _getMarker(id)), "Not your turn");
+        require(winner(id) == 0, "Game over");
 
         _setSymbol(id, space, _getMarker(id));
         games[id].prevMove = _getMarker(id);
 
         uint256 _winner = winner(id);
-        if (_winner != 0) {
+        if (winner(id) != 0) {
             address winnerAddress = (_winner == X)
                 ? games[id].playerX
                 : games[id].playerO;
