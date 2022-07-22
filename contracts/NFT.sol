@@ -106,7 +106,7 @@ contract NFT is INFT, ERC721, Ownable {
     }
 
     function _getColor(uint256 tokenId) internal view returns (string memory) {
-        return colors[colors.length % tokenId];
+        return colors[colors.length % _gameId(tokenId)];
     }
 
     function _tokenName(uint256 tokenId) internal pure returns (string memory) {

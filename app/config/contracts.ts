@@ -4,9 +4,9 @@ const { polygonMumbai, hardhat } = chain;
 
 export const config = {
   [polygonMumbai.id]: {
-    game: "0x8ffbFa177ae63760a77371dEE0fEcdA7A8c81aC2",
-    token: "0xbDba800812D500dcB4cDD19C15712D68aC08406d",
-    nft: "0x0239E20a0d606BD588B3E6cEbBdcEbbf1c0FF879",
+    game: "0x29bf075597526529789f3BCB2074aC2ADf602bDC",
+    token: "0x048038894743d1ca62Ee0c04796c5FEEa8416322",
+    nft: "0x9F2693425e7670027Ff65e0a1d08Fbcab3E05440",
   },
   [hardhat.id]: {
     game: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
